@@ -66,7 +66,7 @@ app_license = "MIT"
 # ------------
 
 # before_install = "email_delivery_service.install.before_install"
-# after_install = "email_delivery_service.install.after_install"
+after_install = "email_delivery_service.install.after_install"
 
 # Uninstallation
 # ------------
