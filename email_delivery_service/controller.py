@@ -19,7 +19,11 @@ def send(self, sender, recipient, msg):
 		files=files,
 	)
 	
-	update_queue_status(self, json.loads(resp.text)["message"])
+	resp = json.loads(resp.text)
+	try:
+		update_queue_status(self, json.loads(resp.text)["message"], commit=True)
+	except Exception as e:
+		frappe.throw(f"{resp['exc_type']}: {resp['exception']}")
 
 @frappe.whitelist(allow_guest=True)
 def update_status(**data):
