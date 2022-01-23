@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include email_delivery_service *.css
+recursive-include email_delivery_service *.csv
+recursive-include email_delivery_service *.html
+recursive-include email_delivery_service *.ico
+recursive-include email_delivery_service *.js
+recursive-include email_delivery_service *.json
+recursive-include email_delivery_service *.md
+recursive-include email_delivery_service *.png
+recursive-include email_delivery_service *.py
+recursive-include email_delivery_service *.svg
+recursive-include email_delivery_service *.txt
+recursive-exclude email_delivery_service *.pyc
