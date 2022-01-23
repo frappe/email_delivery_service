@@ -44,7 +44,7 @@ app_license = "MIT"
 
 # website user home page (by Role)
 # role_home_page = {
-#	"Role": "home_page"
+# 	"Role": "home_page"
 # }
 
 # Generators
@@ -109,7 +109,7 @@ after_install = "email_delivery_service.install.after_install"
 # 		"on_update": "method",
 # 		"on_cancel": "method",
 # 		"on_trash": "method"
-#	}
+# 	}
 # }
 
 # Scheduled Tasks
@@ -187,4 +187,3 @@ after_install = "email_delivery_service.install.after_install"
 # auth_hooks = [
 # 	"email_delivery_service.auth.validate"
 # ]
-
