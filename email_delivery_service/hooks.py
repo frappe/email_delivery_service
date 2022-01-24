@@ -9,6 +9,7 @@ app_color = "grey"
 app_email = "rutwik@frappe.io"
 app_license = "MIT"
 
+override_email_send = ["email_delivery_service.controller.send"]
 # Includes in <head>
 # ------------------
 
