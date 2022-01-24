@@ -4,6 +4,18 @@
 
 frappe.query_reports["Email Delivery Analytics"] = {
 	"filters": [
-
+        {
+            "fieldname": "status",
+            "label": __("Status"),
+            "fieldtype": "Select",
+            "options": "all\ndelivered\nfailed",
+            "default": "all"
+        },
+        {
+            "fieldname": "month",
+            "label": __("Month"),
+            "fieldtype": "Select",
+            "options": "\nJanuary\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember",
+        }
 	]
 };
