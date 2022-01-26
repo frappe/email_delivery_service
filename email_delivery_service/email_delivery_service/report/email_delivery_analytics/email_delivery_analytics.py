@@ -94,13 +94,13 @@ def get_current_month(this_month):
 def get_data_from_api(filters):
 	cur_month = get_current_month(filters.get("month", datetime.now().month))
 	data = {
-		"key": frappe.get_site_config().get("sk_mail", "fcmailfree100"),
+		"key": frappe.get_site_config().get("sk_mail"),
 		"site": frappe.local.site,
 		"month": cur_month,
 		"status": "" if filters["status"] == "all" else filters["status"],
 	}
 	resp = requests.post(
-		"http://0.0.0.0:8003/api/method/press.api.email.get_analytics", data=data
+		"https://frappecloud.com/api/method/press.api.email.get_analytics", data=data
 	)
 
 	# prepare data based on status
