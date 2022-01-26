@@ -8,7 +8,7 @@ frappe.query_reports["Email Delivery Analytics"] = {
             "fieldname": "status",
             "label": __("Status"),
             "fieldtype": "Select",
-            "options": "all\ndelivered\nfailed",
+            "options": "all\ndelivered\nfailed\nsuspended",
             "default": "all"
         },
         {

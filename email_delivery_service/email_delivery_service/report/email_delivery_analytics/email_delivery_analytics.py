@@ -12,14 +12,14 @@ def get_analytics_chart(chart_data):
 	labels = chart_data["labels"]
 	sent = chart_data["sent"]
 	failed = chart_data["failed"]
-	supressed = chart_data["supressed"]
+	suspension = chart_data["suspension"]
 	return {
 		"data": {
 			"labels": labels,
 			"datasets": [
 				{"name": "delivered", "values": sent},
 				{"name": "failed", "values": failed},
-				{"name": "supressed", "values": supressed},
+				{"name": "suspended", "values": suspension},
 			],
 		},
 		"fieldtype": "Int",
@@ -28,7 +28,7 @@ def get_analytics_chart(chart_data):
 	}
 
 
-def get_report_summary(sent, failed, supressed):
+def get_report_summary(sent, failed, suspension):
 	return [
 		{
 			"value": sent,
@@ -43,9 +43,9 @@ def get_report_summary(sent, failed, supressed):
 			"datatype": "Int",
 		},
 		{
-			"value": supressed,
+			"value": suspension,
 			"indicator": "orange",
-			"label": "Total Emails Supressed",
+			"label": "Total Emails Suspended",
 			"datatype": "Int",
 		},
 	]
@@ -91,25 +91,29 @@ def get_current_month(this_month):
 	return months.index(this_month)
 
 
-def execute(filters=None):
+def get_data_from_api(filters):
 	cur_month = get_current_month(filters.get("month", datetime.now().month))
-
 	data = {
-		"key": frappe.get_site_config().get("sk_mail"),
+		"key": frappe.get_site_config().get("sk_mail", "fcmailfree100"),
 		"site": frappe.local.site,
 		"month": cur_month,
 		"status": "" if filters["status"] == "all" else filters["status"],
 	}
 	resp = requests.post(
-		"https://frappecloud.com/api/method/press.api.email.get_analytics", data=data
+		"http://0.0.0.0:8003/api/method/press.api.email.get_analytics", data=data
 	)
 
 	# prepare data based on status
-	response = json.loads(resp.text)["message"]
+	return json.loads(resp.text)["message"]
+
+
+def execute(filters=None):
+	response = get_data_from_api(filters)
+
 	labels = []
 	sent = []
 	failed = []
-	supressed = []
+	suspension = []
 
 	for rec in response:
 		if rec["date"] not in labels:  # make first entry
@@ -117,15 +121,15 @@ def execute(filters=None):
 			if rec["status"] == "delivered":
 				sent.append(1)
 				failed.append(0)
-				supressed.append(0)
+				suspension.append(0)
 			elif rec["status"] == "failed":
 				failed.append(1)
 				sent.append(0)
-				supressed.append(0)
+				suspension.append(0)
 			else:
 				sent.append(0)
 				failed.append(0)
-				supressed.append(1)
+				suspension.append(1)
 
 		elif rec["date"] in labels:  # update existing entry
 			ndx = labels.index(rec["date"])
@@ -134,11 +138,16 @@ def execute(filters=None):
 			elif rec["status"] == "failed":
 				failed[ndx] += 1
 			else:
-				supressed[ndx] += 1
+				suspension[ndx] += 1
 
-	chart_data = {"labels": labels, "sent": sent, "failed": failed, "supressed": supressed}
+	chart_data = {
+		"labels": labels,
+		"sent": sent,
+		"failed": failed,
+		"suspension": suspension,
+	}
 	chart = get_analytics_chart(chart_data)
-	report_summary = get_report_summary(sum(sent), sum(failed), sum(supressed))
+	report_summary = get_report_summary(sum(sent), sum(failed), sum(suspension))
 	columns = get_columns()
 
 	return columns, response, None, chart, report_summary
