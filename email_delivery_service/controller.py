@@ -11,7 +11,7 @@ def send(self, sender, recipient, msg):
 	data = {
 		"sender": sender,
 		"recipients": recipient,
-		"sk_mail": frappe.get_site_config().get("sk_mail", "fcmailfree100"),
+		"sk_mail": frappe.get_site_config().get("sk_email_delivery_service"),
 		"site": frappe.local.site,
 	}
 	files = {"mime": msg}
