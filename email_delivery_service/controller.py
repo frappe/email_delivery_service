@@ -5,7 +5,9 @@ import requests
 
 
 def send(self, sender, recipient, msg):
-	""" Send emails to recipients."""
+	"""
+	Send request to api
+	"""
 	data = {
 		"sender": sender,
 		"recipients": recipient,
@@ -29,7 +31,9 @@ def send(self, sender, recipient, msg):
 
 @frappe.whitelist(allow_guest=True)
 def update_status(**data):
-	"""Update status of queued email via webhook"""
+	"""
+	Update status of queued email via webhook
+	"""
 	docname = frappe.db.get_value(
 		"Email Queue", {"message_id": data["message_id"]}, "name"
 	)
