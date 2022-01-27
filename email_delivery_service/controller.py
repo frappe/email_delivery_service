@@ -24,7 +24,7 @@ def send(self, sender, recipient, msg):
 
 	resp = json.loads(resp.text)
 	try:
-		update_queue_status(self, json.loads(resp.text)["message"], commit=True)
+		update_queue_status(self, resp["message"], commit=True)
 	except Exception as e:
 		frappe.throw(f"{resp['exc_type']}: {resp['exception']}")
 
