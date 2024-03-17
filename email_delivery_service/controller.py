@@ -36,7 +36,11 @@ def update_status(**data):
 	Update status of queued email via webhook
 	"""
 	secret_key = frappe.get_site_config().get("sk_email_delivery_service")
-	if secret_key == data["secret_key"]:
+	event_secret_key = data.get("secret_key")
+	if not event_secret_key:
+		return
+
+	if secret_key == event_secret_key:
 		docname = frappe.db.get_value(
 			"Email Queue", {"message_id": data["message_id"]}, "name"
 		)
