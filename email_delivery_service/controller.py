@@ -21,13 +21,12 @@ def send(self, sender, recipient, msg):
 		data={"data": json.dumps(data)},
 		files=files,
 	)
-	
+
 	if resp.status_code == 200:
 		resp = json.loads(resp.text)
-		try:
-			update_queue_status(self, resp["message"], commit=True)
-		except Exception as e:
-			frappe.throw(f"{resp['exc_type']}: {resp['exception']}")
+		update_queue_status(self, "Sending", commit=True)
+	else:
+		update_queue_status(self, "Error", resp.exc, commit=True)
 
 
 @frappe.whitelist(allow_guest=True)
@@ -56,8 +55,10 @@ def update_status(**data):
 	return
 
 
-def update_queue_status(queue, status, commit=False):
+def update_queue_status(queue, status, error=None, commit=False):
 	frappe.db.set_value("Email Queue", queue.name, "status", status)
+	if error:
+		frappe.db.set_value("Email Queue", queue.name, "error", error)
 	if commit:
 		frappe.db.commit()
 	if queue.communication:
