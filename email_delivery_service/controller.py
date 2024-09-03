@@ -28,7 +28,7 @@ def send(self, sender, recipient, msg):
 			error = json.dumps(json.loads(resp.text), indent=4)
 		except json.decoder.JSONDecodeError:
 			error = resp.text
-		frappe.throw("Error sending email", error)
+		frappe.throw(f"Error sending email: {error}")
 
 
 @frappe.whitelist(allow_guest=True)
