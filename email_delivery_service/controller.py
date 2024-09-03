@@ -57,10 +57,8 @@ def update_status(**data):
 	return
 
 
-def update_queue_status(queue, status, error=None, commit=False):
+def update_queue_status(queue, status, commit=False):
 	frappe.db.set_value("Email Queue", queue.name, "status", status)
-	if error:
-		frappe.db.set_value("Email Queue", queue.name, "error", error)
 	if commit:
 		frappe.db.commit()
 	if queue.communication:
