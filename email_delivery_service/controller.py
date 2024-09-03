@@ -25,13 +25,10 @@ def send(self, sender, recipient, msg):
 		update_queue_status(self, "Sending", commit=True)
 	else:
 		try:
-			error = resp.json().get("exc")
+			error = json.dumps(json.loads(resp.text), indent=4)
 		except json.decoder.JSONDecodeError:
 			error = resp.text
-		try:
-			update_queue_status(self, "Error", error, commit=True)
-		except Exception as e:
-			frappe.log_error("Error updating queue status", e)
+		frappe.throw("Error sending email", error)
 
 
 @frappe.whitelist(allow_guest=True)
