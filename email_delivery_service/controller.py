@@ -26,8 +26,8 @@ def send(self, sender, recipient, msg):
 	else:
 		try:
 			error = resp.json()
-			exc_type = error.get["exc_type"]
-			exception = error.get["exception"]
+			exc_type = error["exc_type"]
+			exception = error["exception"]
 			frappe.throw(exc=exc_type, msg=exception)
 		except (json.decoder.JSONDecodeError, KeyError):
 			error = resp.text
