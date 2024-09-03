@@ -28,10 +28,10 @@ def send(self, sender, recipient, msg):
 			error = resp.json()
 			exc_type = error.get["exc_type"]
 			exception = error.get["exception"]
-			raise Exception(exc_type, exception)
+			frappe.throw(exc=exc_type, msg=exception)
 		except (json.decoder.JSONDecodeError, KeyError):
 			error = resp.text
-			raise Exception(error)
+			frappe.throw(error, requests.HTTPError)
 
 
 @frappe.whitelist(allow_guest=True)
