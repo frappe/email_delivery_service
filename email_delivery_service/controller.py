@@ -44,24 +44,26 @@ def update_status(**data):
 	if not event_secret_key:
 		return
 
-	if secret_key == event_secret_key:
-		docname = frappe.db.get_value(
-			"Email Queue", {"message_id": data["message_id"]}, "name"
-		)
+	if secret_key != event_secret_key:
+		return
 
-		doc = frappe.get_doc("Email Queue", docname)
-		if data["status"] == "delivered":
-			status = "Sent"
-		elif data["status"] == "failed":
-			status = "Error"
+	q_name = frappe.db.get_value("Email Queue", {"message_id": data["message_id"]}, "name")
+	q = frappe.get_doc("Email Queue", q_name)
 
-		update_queue_status(doc, status, commit=True)
+	error = ""
+	status = "Sent"  # Default status by SendMailContext
 
-	return
+	if data["status"] == "failed":
+		status = "Error"
+		error = data.get("delivery_message")
+
+	update_queue_status(q, status, error, commit=True)
 
 
-def update_queue_status(queue, status, commit=False):
+def update_queue_status(queue, status, error: str = "", commit=False):
 	frappe.db.set_value("Email Queue", queue.name, "status", status)
+	if error:
+		frappe.db.set_value("Email Queue", queue.name, "error", error)
 	if commit:
 		frappe.db.commit()
 	if queue.communication:
