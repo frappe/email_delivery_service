@@ -182,6 +182,10 @@ after_install = "email_delivery_service.install.after_install"
 # 	}
 # ]
 
+fixtures = [
+    "Client Script",
+]
+
 # Authentication and authorization
 # --------------------------------
 
