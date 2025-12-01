@@ -2,23 +2,12 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
-  "dt": "Site",
-  "enabled": 1,
-  "modified": "2025-04-16 10:14:49.941703",
-  "module": null,
-  "name": "site-form",
-  "script": "frappe.ui.form.on('Site', {\n\trefresh(frm) {\n\t\tfrm.add_custom_button('Extend Trial', () => {\n\t\t    frappe.set_route('List', 'Site Trial Extension', {'site': frm.doc.name})\n\t\t}, 'Subscription')\n\t\t\n\t\tfrm.add_custom_button('Change Plan', () => {\n\t\t  //  frappe.new_doc('Site Plan Change', { site: frm.doc.name });\n\t\t  let d = new frappe.ui.Dialog({\n\t\t      title: 'Change Plan',\n\t\t      fields: [\n\t\t          {fieldtype: 'Link', fieldname: 'plan', label: 'Plan', options: 'Site Plan', reqd: 1},\n\t\t          {fieldtype: 'Small Text', fieldname: 'reason', label: 'Reason', reqd: 1},\n\t\t      ],\n\t\t      primary_action({ plan, reason }) {\n\t\t          frappe.call('site-change-plan', { site: frm.doc.name, plan, reason })\n\t\t            .then(r => {\n\t\t                if (!r.exc) {\n\t\t                    frappe.show_alert(`Plan changed to ${plan}`);\n\t\t                }\n\t\t            });\n\t\t      }\n\t\t  });\n\t\t  d.show()\n\t\t}, 'Subscription')\n\t    \n\t    frm.add_custom_button('Change Team', () => {\n\t\t    frappe.new_doc('Team Change', { document_name: frm.doc.name, document_type: 'Site', from_team: frm.doc.team, transfer_completed: 1 });\n\t\t}, 'Subscription')\n\t\t\n\t\tfrm.add_custom_button('Change Server', () => {\n\t\t    frappe.set_route('List', 'Site Migration', {'site': frm.doc.name})\n\t\t}, 'Actions')\n\t\t\n\t\t\n\t\t\n\t\tconsole_access_help(frm);\n\t\tsite_information_for_support_staff(frm);\n\t}\n})\n\nasync function site_information_for_support_staff(frm) {\n    let content = ''\n    let result = await frappe.db.get_value('Server', frm.doc.server, 'team')\n    if (result.message.team == frm.doc.team) {\n        content += `<div class=\"mt-2 container-fluid\">\n            <div class=\"row\"><div class=\"col\">Dedicated Server Plan</div></div>\n        </div>\n        `\n    }\n    frm.dashboard.set_headline(content);\n}\n\nasync function console_access_help(frm) {\n\tlet steps = `- Create [User SSH Certificate](https://frappecloud.com/app/user-ssh-certificate/new-user-ssh-certificate?access_server=${frm.doc.server})\n- ssh into ${frm.doc.server} (using instructions in User SSH Certificate)\n- \\`docker exec -it ${frm.doc.bench} bash\\`\n- \\`bench --site ${frm.doc.name} console\\`\n\nAlternatively, if you have direct SSH use this single command:\n\n\\`ssh frappe@frappe.cloud -t 'ssh root@${frm.doc.server} -t docker exec -it ${frm.doc.bench} bash'\\`\n`\n\n\n\tfrm.add_custom_button('Console Access Help', () => {\n\t    frappe.msgprint(frappe.markdown('### Steps to gain console access\\n\\n\\n' + steps + '\\n'));\n\t});\n}",
-  "view": "Form"
- },
- {
-  "docstatus": 0,
-  "doctype": "Client Script",
   "dt": "Email Account",
   "enabled": 1,
-  "modified": "2025-08-13 12:40:26.902954",
+  "modified": "2025-10-03 16:34:50.298272",
   "module": "Email Delivery Service",
   "name": "Email account won't work warning",
-  "script": "frappe.ui.form.on('Email Account', {\n\trefresh(frm) {\n\t\tif (frm.doc.enable_outgoing) {\n\t\t\tfrm.dashboard.set_headline_alert(\n\t\t\t\t__(\n\t\t\t\t\t\"You have Email Delivery Service app installed due to which emails won't be sent from this account. Uninstall the app to use current Email Account for sending.\",\n\t\t\t\t),\n\t\t\t\t'yellow',\n\t\t\t);\n\t\t}\n\t},\n});\n",
+  "script": "frappe.ui.form.on('Email Account', {\n\trefresh(frm) {\n// \t\tif (frm.doc.enable_outgoing) {\n\t\t\tsite_name = window.location.hostname;\n\t\t\tuninstall_link = `https://cloud.frappe.io/dashboard/sites/${site_name}/apps`;\n\t\t\teds_a_tag = `<a style='text-decoration: underline;' href='https://cloud.frappe.io/marketplace/apps/email_delivery_service'>Email Delivery Service</a>`;\n\t\t\t//make a head request to /api/method/ping and check if response has server header set as 'Frappe Cloud'\n\t\t\tis_frappe_cloud = fetch('/api/method/ping', { method: 'HEAD' }).then(\n\t\t\t\t(response) => {\n\t\t\t\t\tif (response.headers.get('server') === 'Frappe Cloud') {\n\t\t\t\t\t\treturn true;\n\t\t\t\t\t}\n\t\t\t\t\treturn false;\n\t\t\t\t},\n\t\t\t);\n\t\t\tuninstall_a_tag = `<a style='text-decoration: underline;' href='${uninstall_link}'>uninstall the app</a>`;\n\t\t\tif (!is_frappe_cloud) {\n\t\t\t\tuninstall_a_tag = 'uninstall the app';\n\t\t\t}\n\t\t\tfrm.dashboard.set_headline_alert(\n\t\t\t\t__(\n\t\t\t\t\t`You have ${eds_a_tag} app installed due to which emails won't be sent from this account. Please ${uninstall_a_tag} to use current Email Account for sending.`,\n\t\t\t\t),\n\t\t\t\t'yellow',\n\t\t\t);\n// \t\t}\n\t},\n});\n",
   "view": "Form"
  }
 ]
