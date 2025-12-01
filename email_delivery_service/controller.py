@@ -3,6 +3,11 @@ import frappe
 import json
 import requests
 
+def get_exception_message(error: dict):
+	e = error.get("_server_messages")
+	if e:
+		return e['message']
+	return error['exception']
 
 def send(self, sender, recipient, msg):
 	"""
@@ -27,7 +32,7 @@ def send(self, sender, recipient, msg):
 		try:
 			error = resp.json()
 			exc_type = error["exc_type"]
-			exception = error["exception"]
+			exception = get_exception_message(error)
 			frappe.throw(exc=exc_type, msg=exception)
 		except (json.decoder.JSONDecodeError, KeyError):
 			error = resp.text
