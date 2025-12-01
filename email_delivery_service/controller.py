@@ -1,13 +1,17 @@
-import frappe
-
 import json
+
+import frappe
 import requests
+
 
 def get_exception_message(error: dict):
 	srv_msgs = error.get("_server_messages")
 	if srv_msgs:
-		return '\n'.join(msg['message'] for msg in srv_msgs)
-	return error['exception']
+		msg_list = json.loads(srv_msgs) # list of 1 stringified json
+		msg_dict = json.loads(msg_list[0])  # convert stringified json to dict
+		return msg_dict.get("message")
+	return error.get("exception") or json.dumps(error)
+
 
 def send(self, sender, recipient, msg):
 	"""
