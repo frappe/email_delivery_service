@@ -4,9 +4,9 @@ import json
 import requests
 
 def get_exception_message(error: dict):
-	e = error.get("_server_messages")
-	if e:
-		return e['message']
+	srv_msgs = error.get("_server_messages")
+	if srv_msgs:
+		return '\n'.join(msg['message'] for msg in srv_msgs)
 	return error['exception']
 
 def send(self, sender, recipient, msg):
